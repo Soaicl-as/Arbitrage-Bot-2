@@ -1,6 +1,7 @@
 import os
 import time
 import schedule
+import threading
 from datetime import datetime
 from dotenv import load_dotenv
 import logging
@@ -8,6 +9,7 @@ from odds_fetcher import fetch_all_odds
 from arbitrage_finder import find_arbitrage_opportunities
 from email_sender import send_email, send_test_email
 from heartbeat import ping_heartbeat
+from server import start_server
 
 # Load environment variables
 load_dotenv()
@@ -57,15 +59,30 @@ def check_for_arbitrage():
     except Exception as e:
         error_message = f"Error in arbitrage check: {str(e)}"
         logger.error(error_message)
-        send_email({
-            "type": "error",
-            "message": error_message,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        })
+        
+        # Send error notification email
+        try:
+            send_email({
+                "type": "error",
+                "message": error_message,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+        except Exception as email_error:
+            logger.error(f"Failed to send error email: {str(email_error)}")
+
+def start_flask_server():
+    """Start the Flask server in a separate thread"""
+    thread = threading.Thread(target=start_server)
+    thread.daemon = True  # This ensures the thread will exit when the main program exits
+    thread.start()
+    logger.info("Flask server started in background thread")
 
 def main():
     """Main entry point for the arbitrage bot"""
     logger.info("Starting Sports Arbitrage Bot")
+    
+    # Start the Flask server for health checks
+    start_flask_server()
     
     # Run immediately on startup
     check_for_arbitrage()
@@ -74,10 +91,29 @@ def main():
     schedule.every(2).minutes.do(check_for_arbitrage)
     schedule.every(3).minutes.do(ping_heartbeat)
     
+    logger.info("Scheduled tasks have been set up")
+    
     # Keep the script running
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    try:
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    except KeyboardInterrupt:
+        logger.info("Bot stopped by user")
+    except Exception as e:
+        logger.error(f"Unexpected error in main loop: {str(e)}")
+        
+        # Attempt to send error notification
+        try:
+            send_email({
+                "type": "error",
+                "message": f"Bot crashed with error: {str(e)}",
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+        except:
+            pass
+        
+        raise
 
 if __name__ == "__main__":
     main()
