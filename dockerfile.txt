@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# Environment variables are provided by Render
+ENV PYTHONUNBUFFERED=1
+
+# Start the app
+CMD gunicorn --workers=1 --threads=2 --timeout=120 "server:app" & python main.py

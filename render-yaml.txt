@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: sports-arbitrage-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --workers=1 --threads=2 --timeout=120 "server:app" & python main.py
+    healthCheckPath: /health
+    envVars:
+      - key: SMTP_SERVER
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SENDER_EMAIL
+        sync: false
+      - key: SENDER_PASSWORD
+        sync: false
+      - key: RECIPIENT_EMAIL
+        sync: false
+      - key: APP_URL
+        fromService:
+          name: sports-arbitrage-bot
+          type: web
+          property: url

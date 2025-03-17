@@ -1,0 +1,12 @@
+# Email Configuration
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SENDER_EMAIL=your-email@gmail.com
+SENDER_PASSWORD=your-app-password
+RECIPIENT_EMAIL=your-email@gmail.com
+
+# Application URL for heartbeat (Set this in Render)
+APP_URL=https://your-app-name.onrender.com
+
+# Port for the health check server
+PORT=10000
