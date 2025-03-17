@@ -1,12 +1,30 @@
 # Email Configuration
 SMTP_SERVER=smtp.gmail.com
 SMTP_PORT=587
-SENDER_EMAIL=your-email@gmail.com
-SENDER_PASSWORD=your-app-password
-RECIPIENT_EMAIL=your-email@gmail.com
+SENDER_EMAIL=your-sports-arb-bot@gmail.com
+SENDER_PASSWORD=your-app-password-from-google-account
+RECIPIENT_EMAIL=your-notification-email@example.com
 
 # Application URL for heartbeat (Set this in Render)
-APP_URL=https://your-app-name.onrender.com
+APP_URL=https://sports-arbitrage-bot.onrender.com
 
 # Port for the health check server
 PORT=10000
+
+# Logging level
+LOG_LEVEL=INFO
+
+# Database path
+DB_PATH=arbitrage_data.db
+
+# Odds fetcher configuration
+# Minimum wait time between requests (seconds)
+MIN_WAIT=2.0
+# Maximum wait time between requests (seconds)
+MAX_WAIT=4.0
+
+# Arbitrage detection settings
+# Minimum arbitrage percentage to consider (lower is better)
+MIN_ARBITRAGE_PCT=0.98
+# Minimum arbitrage profit to notify about ($ per $100 stake)
+MIN_PROFIT_THRESHOLD=1.50
